@@ -589,6 +589,11 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::FromWokrSpaceToUb(const 
     }
     DataCopyAlignGmToUb(dstLocal[dstUbOffset], curMm1ResGm_[srcGmOffset],
         seqCntInfo.dealedSeqCnt, copyColCount, srcSingleRowCount, dstSingleRowCount);
+    printf("srcGmOffset=%d\n", srcGmOffset);
+    printf("dStartIdx=%d\n", dStartIdx);
+    printf("srcSingleRowElemNum=%d\n", srcSingleRowElemNum);
+    printf("sliceInfo.dealedSeqCnt=%d\n", sliceInfo.dealedSeqCnt);
+
     AscendC::DumpTensor(dstLocal[dstUbOffset], __LINE__, 1024);
     AscendC::DumpTensor(curMm1ResGm_[srcGmOffset], __LINE__, 1024);
 }
