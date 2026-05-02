@@ -73,11 +73,16 @@ template <typename COMP>
 __aicore__ inline uint32_t CompressorTools<COMP>::GetSeqUsed(uint32_t bIdx)
 {
     if (isExistSeqUsed_) {
+        printf("1bSeqUsed=%d\n", (uint32_t)sequsedGm_.GetValue(bIdx));
         return (uint32_t)sequsedGm_.GetValue(bIdx);
     } else {
         if constexpr (COMP::xLayout == X_LAYOUT::TH) {
+            printf("2bSeqUsed=%d\n", (uint32_t)(cuSeqlensGm_.GetValue(bIdx + 1) - cuSeqlensGm_.GetValue(bIdx)));
+
             return (uint32_t)(cuSeqlensGm_.GetValue(bIdx + 1) - cuSeqlensGm_.GetValue(bIdx));
         } else {
+            printf("3bSeqUsed=%d\n", toolParams_.seqSize);
+
             return toolParams_.seqSize;
         }
     }
