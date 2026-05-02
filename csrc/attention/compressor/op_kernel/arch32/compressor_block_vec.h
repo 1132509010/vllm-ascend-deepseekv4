@@ -574,7 +574,10 @@ __aicore__ inline void CompressorBlockVector<COMP>::WriteToCacheState(const Glob
             copyParams.blockLen = dDealSize / (32 / sizeof(T));
             copyParams.dstStride = (coff * constInfo_.headDim - dDealSize) / (32 / sizeof(T));
             copyParams.srcStride = (coff * dDealSize - dDealSize) / (32 / sizeof(T));
+            // printf("stateOffset=%d, copyRowCnt=%d, copyParams.blockLen=%d, dstStride=%d, srcStride=%d\n",
+            //     stateOffset, copyRowCnt, copyParams.blockLen, copyParams.dstStride, copyParams.srcStride);
             DataCopy(state[stateOffset], input[copyFinishRowCnt * coff * dDealSize], copyParams);
+            AscendC::DumpTensor(state[stateOffset], __LINE__, 1024);
         }
 
         copyFinishRowCnt += copyRowCnt;

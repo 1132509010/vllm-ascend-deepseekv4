@@ -583,10 +583,12 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::FromWokrSpaceToUb(const 
         uint32_t preSrcGmOffset = sliceInfo.preDealedSeqCnt * srcSingleRowElemNum + dStartIdx;
         DataCopyAlignGmToUb(dstLocal[dstUbOffset], preMm1ResGm_[preSrcGmOffset],
             seqCntInfo.preDealedSeqCnt, copyColCount, srcSingleRowCount, dstSingleRowCount);
+        AscendC::DumpTensor(dstLocal[dstUbOffset], __LINE__, 1024);
         dstUbOffset += BUFFER_SIZE_BYTE_16K / sizeof(T);
     }
     DataCopyAlignGmToUb(dstLocal[dstUbOffset], curMm1ResGm_[srcGmOffset],
         seqCntInfo.dealedSeqCnt, copyColCount, srcSingleRowCount, dstSingleRowCount);
+    AscendC::DumpTensor(dstLocal[dstUbOffset], __LINE__, 1024);
 }
 
 // template <typename COMP>
@@ -680,10 +682,12 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::WriteToCacheState(const 
             copyParams.blockLen = dDealSize / (32 / sizeof(T));
             copyParams.dstStride = (coff * constInfo_.headDim - dDealSize) / (32 / sizeof(T));
             copyParams.srcStride = (coff * dDealSize - dDealSize) / (32 / sizeof(T));
-            // printf("stateOffset=%d, copyRowCnt=%d, dDealSize=%d, dstStride=%d, srcStride=%d\n",
-            //     stateOffset, copyRowCnt, dDealSize, (coff * constInfo_.headDim - dDealSize), (coff * dDealSize - dDealSize));
+            printf("stateOffset=%d, copyRowCnt=%d, dDealSize=%d, dstStride=%d, srcStride=%d\n",
+                stateOffset, copyRowCnt, dDealSize, (coff * constInfo_.headDim - dDealSize), (coff * dDealSize - dDealSize));
             DataCopy(state[stateOffset], input[copyFinishRowCnt * coff * dDealSize], copyParams);
-            // AscendC::DumpTensor(state[stateOffset], 110, 64);
+            AscendC::DumpTensor(state[stateOffset], __LINE__, 1024);
+            AscendC::DumpTensor(input[copyFinishRowCnt * coff * dDealSize], __LINE__, 1024);
+
         }
 
         copyFinishRowCnt += copyRowCnt;
@@ -707,6 +711,7 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::SaveLeftFirst(const Loca
     // }
 
     uint32_t bSeqUsed = GetSeqUsed(preBIdx);
+    printf("bSeqUsed=%d\n", bSeqUsed);
     uint32_t bStartPos = GetStartPos(preBIdx);
 
     uint32_t endIdxInBlock = (bStartPos + bSeqUsed) % constInfo_.cmpRatio;
@@ -913,7 +918,9 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::UpdateState(const LocalT
 
     SetFlag<HardEvent::V_MTE3>(eventId_V_MTE3);
     WaitFlag<HardEvent::V_MTE3>(eventId_V_MTE3);
+    printf("SaveState(kvLocal, scoreLocal, sliceInfo, dStartIdx, dDealSize)");
     SaveState(kvLocal, scoreLocal, sliceInfo, dStartIdx, dDealSize);
+    printf("ReadState(kvLocal, scoreLocal, sliceInfo, dStartIdx, dDealSize) END");
     SetFlag<HardEvent::MTE3_MTE2>(eventId_MTE3_MTE2);
     SetFlag<HardEvent::MTE3_V>(eventId_MTE3_V);
     WaitFlag<HardEvent::MTE3_MTE2>(eventId_MTE3_MTE2);
@@ -984,6 +991,7 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::DealVec1BaseBlock(const 
     SeqCntInfo seqCntInfo = tempSliceIterstor.FullIteratorSlice();
 
     LocalTensor<T> scoreUb = inputQue1.AllocTensor<T>();
+    printf("FromWokrSpaceToUb(scoreUb, sliceInfo, seqCntInfo, dStartIdx, dDealSize)");
     FromWokrSpaceToUb(scoreUb, sliceInfo, seqCntInfo, dStartIdx + constInfo_.dBaseSize, dDealSize);
     // FromWokrSpaceToUb(scoreUb, curMm1ScoreResGm_, sliceInfo.dealedSeqCnt, seqCntInfo.curSeqCnt, dDealSize, 1, xx);
     // if constexpr (COMP::coff == COFF::OVERLAP) {
@@ -1004,6 +1012,7 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::DealVec1BaseBlock(const 
 
 
     LocalTensor<T> kvUb = inputQue1.AllocTensor<T>();
+    printf("FromWokrSpaceToUb(kvUb, sliceInfo, seqCntInfo, dStartIdx, dDealSize)");
     FromWokrSpaceToUb(kvUb, sliceInfo, seqCntInfo, dStartIdx, dDealSize);
     // FromWokrSpaceToUb(kvUb, curMm1KvResGm_, sliceInfo.dealedSeqCnt, seqCntInfo.curSeqCnt, dDealSize, 1, xx);
     // if constexpr (COMP::coff == COFF::OVERLAP) {
