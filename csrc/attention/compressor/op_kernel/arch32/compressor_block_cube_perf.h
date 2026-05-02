@@ -263,6 +263,8 @@ __aicore__ inline void CompressorBlockCubePerf<COMP>::CopyXGmToL1(const RunInfo 
         uint32_t srcDValue = constInfo_.hSize;
         uint32_t dstNzC0Stride = (copySeqCnt + 15) / 16 * 16;    // 1行变2行的行方向的偏移，需要16对齐
         CopySingleMatrixNDToNZ(xL1Tensor[xL1Offset], xGm_[gmOffset], nValue, dValue, srcDValue, dstNzC0Stride);
+        AscendC::DumpTensor(xL1Tensor[xL1Offset], __LINE__, nValue*dValue);
+        AscendC::DumpTensor(xGm_[gmOffset], __LINE__,  nValue*dValue);
     }
 }
 
@@ -280,6 +282,10 @@ __aicore__ inline void CompressorBlockCubePerf<COMP>::CopyWeightGmToL1(LocalTens
     uint32_t dstNzC0Stride = 2 * constInfo_.dBaseSize; // 2: wkv和wgate各搬运dBaseSize行, dBaseSize需保证8的倍数
     CopySingleMatrixNDToNZ(wL1Tensor[wkvL1Offset], wkvGm_[gmOffset], nValue, dValue, srcDValue, dstNzC0Stride);
     CopySingleMatrixNDToNZ(wL1Tensor[wgateL1Offset], wgateGm_[gmOffset],  nValue, dValue, srcDValue, dstNzC0Stride);
+    AscendC::DumpTensor(wL1Tensor[wkvL1Offset], __LINE__, nValue*dValue);
+    AscendC::DumpTensor(wL1Tensor[wgateL1Offset], __LINE__,  nValue*dValue);
+    AscendC::DumpTensor(wkvGm_[gmOffset], __LINE__,  nValue*dValue);
+    AscendC::DumpTensor(wgateGm_[gmOffset], __LINE__,  nValue*dValue);
 }
 
 template <typename COMP>
@@ -358,6 +364,10 @@ __aicore__ inline void CompressorBlockCubePerf<COMP>::CopyOutMm1Res(const RunInf
     } else {
         Fixpipe(curMm1ResGm[gmOffset], cL0Tensor, fixParams);
     }
+    printf("curMm1ResGm[gmOffset]=%d\n", gmOffset);
+
+    AscendC::DumpTensor(curMm1ResGm[gmOffset], __LINE__, mDealSize * nDealSize);
+    AscendC::DumpTensor(cL0Tensor, __LINE__, mDealSize * nDealSize);
 
     // kv和score不拼起来，搬运俩个矩阵，待打开
     // uint32_t nDealSize = constInfo_.dBaseSize; // 2: wkv和wgate各搬运dBaseSize行, dBaseSize需保证8的倍数
