@@ -20,6 +20,7 @@ add_ops_compile_options(
                 OPTIONS --cce-auto-sync=off
                 -Wno-deprecated-declarations
                 -Werror
+                --oom
                 -mllvm -cce-aicore-hoist-movemask=false
                 --op_relocatable_kernel_binary=true
 )
