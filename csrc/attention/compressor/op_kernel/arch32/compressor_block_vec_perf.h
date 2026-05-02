@@ -593,6 +593,9 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::FromWokrSpaceToUb(const 
     printf("dStartIdx=%d\n", dStartIdx);
     printf("srcSingleRowElemNum=%d\n", srcSingleRowElemNum);
     printf("sliceInfo.dealedSeqCnt=%d\n", sliceInfo.dealedSeqCnt);
+    printf("copyColCount=%d\n",copyColCount);
+    printf("srcSingleRowCount=%d\n",srcSingleRowCount);
+    printf("dstSingleRowCount=%d\n",dstSingleRowCount);
 
     AscendC::DumpTensor(dstLocal[dstUbOffset], __LINE__, 1024);
     AscendC::DumpTensor(curMm1ResGm_[srcGmOffset], __LINE__, 1024);
