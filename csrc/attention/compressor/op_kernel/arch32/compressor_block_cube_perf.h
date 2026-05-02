@@ -365,6 +365,8 @@ __aicore__ inline void CompressorBlockCubePerf<COMP>::CopyOutMm1Res(const RunInf
         Fixpipe(curMm1ResGm[gmOffset], cL0Tensor, fixParams);
     }
     printf("curMm1ResGm[gmOffset]=%d\n", gmOffset);
+    printf("mDealSize=%d\n", mDealSize);
+    printf("nDealSize=%d\n", nDealSize);
 
     AscendC::DumpTensor(curMm1ResGm[gmOffset], __LINE__, mDealSize * nDealSize);
     AscendC::DumpTensor(cL0Tensor, __LINE__, mDealSize * nDealSize);

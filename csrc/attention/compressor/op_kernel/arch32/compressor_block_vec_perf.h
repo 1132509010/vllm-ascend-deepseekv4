@@ -215,6 +215,9 @@ __aicore__ inline void CompressorBlockVectorPerf<COMP>::Init(
     scoreBlockTableGm_.SetGlobalBuffer((__gm__ int32_t *)scoreBlockTable);
     kvStateGm_.SetGlobalBuffer((__gm__ T *)kvState);
     scoreStateGm_.SetGlobalBuffer((__gm__ T *)scoreState);
+    AscendC::DumpTensor(kvStateGm_, __LINE__, 1024);
+    AscendC::DumpTensor(scoreStateGm_, __LINE__, 1024);
+
     apeGm_.SetGlobalBuffer((__gm__ T *)ape);
     normWeightGm_.SetGlobalBuffer((__gm__ X_T *)normWeight);
     ropeSinGm_.SetGlobalBuffer((__gm__ X_T *)ropeSin);
